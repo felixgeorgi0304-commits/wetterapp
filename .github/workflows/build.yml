@@ -1,0 +1,41 @@
+name: Build
+
+# Baut das Projekt und fuehrt die Tests aus – bei jedem Push auf main
+# und bei jedem Pull Request. Das Ergebnis erscheint als Abzeichen im README.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Bauen und testen
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Quelltext auschecken
+        uses: actions/checkout@v4
+
+      - name: JDK 21 einrichten
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          # Zwischenspeicher fuer die Maven-Abhaengigkeiten,
+          # damit spaetere Laeufe deutlich schneller sind.
+          cache: maven
+
+      - name: Bauen und Tests ausführen
+        run: mvn --batch-mode --no-transfer-progress verify
+
+      - name: Testberichte sichern
+        # Auch dann hochladen, wenn Tests fehlgeschlagen sind –
+        # gerade dann sind die Berichte interessant.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testberichte
+          path: target/surefire-reports/
+          if-no-files-found: ignore

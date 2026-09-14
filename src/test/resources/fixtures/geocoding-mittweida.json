@@ -1,0 +1,20 @@
+{
+  "results": [
+    {
+      "id": 2871845,
+      "name": "Mittweida",
+      "latitude": 50.98617,
+      "longitude": 12.98187,
+      "elevation": 250.0,
+      "feature_code": "PPLA3",
+      "country_code": "DE",
+      "admin1": "Sachsen",
+      "admin2": "Mittelsachsen",
+      "timezone": "Europe/Berlin",
+      "population": 14459,
+      "country": "Deutschland",
+      "country_id": 2921044
+    }
+  ],
+  "generationtime_ms": 0.7
+}

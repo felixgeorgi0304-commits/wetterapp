@@ -1,0 +1,636 @@
+/*
+ * Stylesheet der WetterApp
+ * ------------------------
+ * Aufbau der Datei:
+ *   1. Farbpaletten fuer helles und dunkles Design
+ *   2. Grundlagen und Kopfzeile
+ *   3. Hauptkarte mit wetterabhaengigem Farbverlauf
+ *   4. Stundenverlauf und Tagesvorhersage
+ *   5. Favoritenleiste, Meldungen, Fusszeile
+ *   6. Symbole
+ *
+ * Alle Farben sind als nachschlagbare Werte (looked-up colors) auf dem
+ * Wurzelknoten definiert. JavaFX sucht einen solchen Wert von unten nach oben
+ * im Szenengraphen. Dadurch genuegt es, am Wurzelknoten die Klasse "hell"
+ * gegen "dunkel" zu tauschen: Saemtliche darunterliegenden Elemente greifen
+ * dann automatisch auf die andere Palette zu. Einzelne Bereiche wie die
+ * Hauptkarte koennen einen Wert lokal ueberschreiben, ohne den Rest zu stoeren.
+ */
+
+/* ======================================================================
+   1. Farbpaletten
+   ====================================================================== */
+
+.wurzel {
+    -fx-font-family: "Segoe UI", "SF Pro Text", "Helvetica Neue", "Inter", sans-serif;
+    -fx-font-smoothing-type: gray;
+}
+
+.wurzel.hell {
+    -farbe-grund:        #eceff6;
+    -farbe-karte:        #ffffff;
+    -farbe-karte-rand:   #e3e7f0;
+    -farbe-text:         #161b26;
+    -farbe-text-schwach: #6a7382;
+    -farbe-akzent:       #2f6df6;
+    -farbe-akzent-text:  #ffffff;
+    -farbe-feld:         #ffffff;
+    -farbe-feld-rand:    #d8dde8;
+    -farbe-knopf:        #ffffff;
+    -farbe-knopf-hover:  #eef2fb;
+    -farbe-schiene:      #e6eaf2;
+    -farbe-warnung:      #b4341f;
+    -farbe-warnung-flaeche: #fdecea;
+    -farbe-schatten:     rgba(22, 27, 38, 0.10);
+
+    -farbe-sonne:   #f5a623;
+    -farbe-mond:    #8e9bb5;
+    -farbe-wolke:   #aebbd2;
+    -farbe-wolke-hinten: #ccd5e5;
+    -farbe-tropfen: #3d8ce0;
+    -farbe-flocke:  #74b4e8;
+    -farbe-blitz:   #efad1c;
+    -farbe-nebel:   #b5c0d2;
+}
+
+.wurzel.dunkel {
+    -farbe-grund:        #0d1017;
+    -farbe-karte:        #161a23;
+    -farbe-karte-rand:   #242a36;
+    -farbe-text:         #e9edf5;
+    -farbe-text-schwach: #939cad;
+    -farbe-akzent:       #5c8dff;
+    -farbe-akzent-text:  #0d1017;
+    -farbe-feld:         #1b202b;
+    -farbe-feld-rand:    #2b3240;
+    -farbe-knopf:        #1b202b;
+    -farbe-knopf-hover:  #252c3a;
+    -farbe-schiene:      #262d3a;
+    -farbe-warnung:      #ff9b8a;
+    -farbe-warnung-flaeche: #34201d;
+    -farbe-schatten:     rgba(0, 0, 0, 0.42);
+
+    -farbe-sonne:   #ffc043;
+    -farbe-mond:    #c8d2e6;
+    -farbe-wolke:   #5f6d85;
+    -farbe-wolke-hinten: #3d4757;
+    -farbe-tropfen: #57a5f0;
+    -farbe-flocke:  #8ecbfb;
+    -farbe-blitz:   #ffc93f;
+    -farbe-nebel:   #6b7890;
+}
+
+/* ======================================================================
+   2. Grundlagen und Kopfzeile
+   ====================================================================== */
+
+.wurzel {
+    -fx-background-color: -farbe-grund;
+}
+
+.kopfzeile {
+    -fx-padding: 14 20 14 20;
+    -fx-background-color: -farbe-karte;
+    -fx-border-color: transparent transparent -farbe-karte-rand transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.app-titel {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -farbe-text;
+}
+
+/* --- Suchfeld --------------------------------------------------------- */
+
+.such-rahmen {
+    -fx-background-color: -farbe-feld;
+    -fx-background-radius: 10;
+    -fx-border-color: -farbe-feld-rand;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 0 10 0 12;
+}
+
+/* Hervorhebung, solange das Feld den Tastaturfokus hat. */
+.such-rahmen:fokus {
+    -fx-border-color: -farbe-akzent;
+    -fx-effect: dropshadow(gaussian, -farbe-akzent, 8, 0, 0, 0);
+}
+
+/* Hervorhebung nach einer fehlgeschlagenen Suche. */
+.such-rahmen:fehler {
+    -fx-border-color: -farbe-warnung;
+}
+
+.suchfeld {
+    -fx-background-color: transparent;
+    -fx-text-fill: -farbe-text;
+    -fx-prompt-text-fill: -farbe-text-schwach;
+    -fx-font-size: 13.5px;
+    -fx-padding: 9 2 9 2;
+}
+
+.suchfeld:focused {
+    -fx-background-color: transparent;
+}
+
+/* --- Schaltflaechen mit Symbol ---------------------------------------- */
+
+.ikonen-knopf {
+    -fx-background-color: -farbe-knopf;
+    -fx-background-radius: 10;
+    -fx-border-color: -farbe-feld-rand;
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+    -fx-padding: 8 10 8 10;
+    -fx-cursor: hand;
+}
+
+.ikonen-knopf:hover {
+    -fx-background-color: -farbe-knopf-hover;
+}
+
+.ikonen-knopf:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+.ikonen-knopf:disabled {
+    -fx-opacity: 0.4;
+}
+
+/* Die Hauptschaltflaeche hebt sich farblich ab. */
+.ikonen-knopf.haupt-knopf {
+    -fx-background-color: -farbe-akzent;
+    -fx-border-color: -farbe-akzent;
+}
+
+.ikonen-knopf.haupt-knopf:hover {
+    -fx-opacity: 0.9;
+}
+
+.ikonen-knopf.haupt-knopf .ui-ikone {
+    -fx-stroke: -farbe-akzent-text;
+}
+
+/* Zustand "aktiv": gemerkter Ort bzw. geoeffnete Favoritenleiste. */
+.ikonen-knopf:aktiv .ui-ikone-voll {
+    -fx-fill: -farbe-akzent;
+}
+
+.ikonen-knopf:aktiv .ui-ikone {
+    -fx-stroke: -farbe-akzent;
+}
+
+.ikonen-knopf:aktiv {
+    -fx-border-color: -farbe-akzent;
+}
+
+/* ======================================================================
+   3. Hauptkarte
+   ====================================================================== */
+
+.inhalt-scroll {
+    -fx-background-color: transparent;
+}
+
+.inhalt-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.inhalt {
+    -fx-padding: 20;
+}
+
+.karte {
+    -fx-background-color: -farbe-karte;
+    -fx-background-radius: 16;
+    -fx-border-color: -farbe-karte-rand;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-padding: 18 20 18 20;
+    -fx-effect: dropshadow(gaussian, -farbe-schatten, 14, 0, 0, 3);
+}
+
+.karten-titel {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -farbe-text-schwach;
+}
+
+/*
+ * Die Hauptkarte traegt einen Farbverlauf, der zur Wetterlage passt.
+ * Innerhalb der Karte werden die Symbol- und Textfarben ueberschrieben,
+ * damit sie auf dem farbigen Grund lesbar bleiben – unabhaengig davon,
+ * ob das helle oder das dunkle Design aktiv ist.
+ */
+.held-karte {
+    -fx-background-radius: 20;
+    -fx-padding: 24 26 26 26;
+    -fx-effect: dropshadow(gaussian, -farbe-schatten, 20, 0, 0, 6);
+
+    -farbe-text:         white;
+    -farbe-text-schwach: rgba(255, 255, 255, 0.78);
+    -farbe-sonne:        #ffd873;
+    -farbe-mond:         #f2f5ff;
+    -farbe-wolke:        rgba(255, 255, 255, 0.94);
+    -farbe-wolke-hinten: rgba(255, 255, 255, 0.55);
+    -farbe-tropfen:      rgba(255, 255, 255, 0.95);
+    -farbe-flocke:       rgba(255, 255, 255, 0.95);
+    -farbe-blitz:        #ffe08a;
+    -farbe-nebel:        rgba(255, 255, 255, 0.85);
+
+    /* Rueckfall, falls noch keine Wetterlage gesetzt ist. */
+    -fx-background-color: linear-gradient(to bottom right, #4a6fa5, #35507a);
+}
+
+.held-karte.stimmung-klar {
+    -fx-background-color: linear-gradient(to bottom right, #2f8fe0 0%, #4fb2e8 55%, #7ecbf0 100%);
+}
+
+.held-karte.stimmung-wolken {
+    -fx-background-color: linear-gradient(to bottom right, #63768f 0%, #8397ae 60%, #9fb0c4 100%);
+}
+
+.held-karte.stimmung-regen {
+    -fx-background-color: linear-gradient(to bottom right, #3c5570 0%, #52708e 60%, #6b87a4 100%);
+}
+
+.held-karte.stimmung-schnee {
+    -fx-background-color: linear-gradient(to bottom right, #6a8bab 0%, #93b2cd 60%, #b9d0e2 100%);
+}
+
+.held-karte.stimmung-gewitter {
+    -fx-background-color: linear-gradient(to bottom right, #2f3244 0%, #464a63 60%, #5d5f7d 100%);
+}
+
+.held-karte.stimmung-nacht {
+    -fx-background-color: linear-gradient(to bottom right, #141a33 0%, #263354 60%, #3a4a72 100%);
+}
+
+.ort-name {
+    -fx-font-size: 21px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -farbe-text;
+}
+
+.ort-zeit {
+    -fx-font-size: 12px;
+    -fx-text-fill: -farbe-text-schwach;
+}
+
+.temperatur-gross {
+    -fx-font-size: 66px;
+    -fx-text-fill: -farbe-text;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.18), 10, 0, 0, 3);
+}
+
+.beschreibung {
+    -fx-font-size: 16px;
+    -fx-text-fill: -farbe-text-schwach;
+    -fx-padding: 2 0 0 4;
+}
+
+/* --- Kennzahlen rechts in der Hauptkarte ------------------------------- */
+
+.kennzahlen {
+    -fx-padding: 4 2 4 2;
+}
+
+.kennzahl {
+    -fx-padding: 0 0 0 2;
+}
+
+.kennzahl-name {
+    -fx-font-size: 10.5px;
+    -fx-text-fill: -farbe-text-schwach;
+}
+
+.kennzahl-wert {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -farbe-text;
+}
+
+/* ======================================================================
+   4. Stundenverlauf und Tagesvorhersage
+   ====================================================================== */
+
+.stunden-scroll {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.stunden-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.stunden-leiste {
+    -fx-padding: 4 0 8 0;
+}
+
+.stunden-kachel {
+    -fx-padding: 12 10 12 10;
+    -fx-background-radius: 14;
+    -fx-min-width: 74;
+}
+
+.stunden-kachel:hover {
+    -fx-background-color: -farbe-schiene;
+}
+
+/* Die laufende Stunde wird dauerhaft hervorgehoben. */
+.stunden-kachel.jetzt {
+    -fx-background-color: -farbe-schiene;
+    -fx-border-color: -farbe-akzent;
+    -fx-border-radius: 14;
+    -fx-border-width: 1.4;
+}
+
+.kachel-zeit {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -farbe-text-schwach;
+}
+
+.stunden-kachel.jetzt .kachel-zeit {
+    -fx-text-fill: -farbe-akzent;
+    -fx-font-weight: bold;
+}
+
+.kachel-temperatur {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -farbe-text;
+}
+
+.kachel-regen {
+    -fx-font-size: 10.5px;
+    -fx-text-fill: -farbe-tropfen;
+}
+
+/* --- Tagesvorhersage --------------------------------------------------- */
+
+.tage-liste {
+    -fx-padding: 2 0 2 0;
+}
+
+.tages-zeile {
+    -fx-padding: 9 6 9 6;
+    -fx-background-radius: 10;
+}
+
+.tages-zeile:hover {
+    -fx-background-color: -farbe-schiene;
+}
+
+.zeile-tag {
+    -fx-font-size: 13.5px;
+    -fx-text-fill: -farbe-text;
+}
+
+.tages-zeile.heute .zeile-tag {
+    -fx-font-weight: bold;
+    -fx-text-fill: -farbe-akzent;
+}
+
+.zeile-regen {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -farbe-tropfen;
+}
+
+.zeile-min {
+    -fx-font-size: 13.5px;
+    -fx-text-fill: -farbe-text-schwach;
+}
+
+.zeile-max {
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -farbe-text;
+}
+
+/*
+ * Spannenbalken: Die Schiene stellt die Temperaturspanne der gesamten
+ * Vorhersage dar, die Fuellung den Bereich des jeweiligen Tages darin.
+ */
+.balken-schiene {
+    -fx-background-color: -farbe-schiene;
+    -fx-background-radius: 3;
+}
+
+.balken-fuellung {
+    -fx-background-radius: 3;
+    -fx-background-color: linear-gradient(to right, #4aa3e8, #f0a537);
+}
+
+/* ======================================================================
+   5. Start-, Lade- und Fehleransicht
+   ====================================================================== */
+
+.start-ansicht,
+.lade-ansicht {
+    -fx-padding: 40;
+}
+
+.start-titel {
+    -fx-font-size: 21px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -farbe-text;
+}
+
+.start-text,
+.lade-text {
+    -fx-font-size: 13px;
+    -fx-text-fill: -farbe-text-schwach;
+}
+
+.lade-anzeige {
+    -fx-progress-color: -farbe-akzent;
+}
+
+.meldungs-leiste {
+    -fx-background-color: -farbe-warnung-flaeche;
+    -fx-padding: 10 20 10 20;
+    -fx-border-color: transparent transparent -farbe-karte-rand transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.meldungs-text {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -farbe-warnung;
+}
+
+.meldung-schliessen {
+    -fx-background-color: transparent;
+    -fx-padding: 4;
+    -fx-cursor: hand;
+}
+
+.meldung-schliessen:hover {
+    -fx-background-color: -farbe-schiene;
+    -fx-background-radius: 6;
+}
+
+.leer-hinweis {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -farbe-text-schwach;
+    -fx-padding: 8 0 8 0;
+}
+
+/* ======================================================================
+   6. Favoritenleiste und Fusszeile
+   ====================================================================== */
+
+.favoriten-bereich {
+    -fx-background-color: -farbe-karte;
+    -fx-padding: 18 16 18 16;
+    -fx-border-color: -farbe-karte-rand transparent transparent transparent;
+    -fx-border-width: 0 0 0 1;
+}
+
+.favoriten-titel {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -farbe-text;
+}
+
+.favoriten-leer {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -farbe-text-schwach;
+}
+
+.favoriten-liste {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.favoriten-liste .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 2 0 2 0;
+}
+
+.favoriten-liste .list-cell:hover .favorit-zeile {
+    -fx-background-color: -farbe-schiene;
+}
+
+.favoriten-liste .list-cell:selected .favorit-zeile {
+    -fx-background-color: -farbe-schiene;
+}
+
+.favorit-zeile {
+    -fx-padding: 8 8 8 10;
+    -fx-background-radius: 9;
+}
+
+.favorit-name {
+    -fx-font-size: 13px;
+    -fx-text-fill: -farbe-text;
+}
+
+.favorit-entfernen {
+    -fx-background-color: transparent;
+    -fx-padding: 3;
+    -fx-cursor: hand;
+    -fx-opacity: 0.55;
+}
+
+.favorit-entfernen:hover {
+    -fx-opacity: 1;
+}
+
+.favorit-entfernen:hover .ui-ikone {
+    -fx-stroke: -farbe-warnung;
+}
+
+.fusszeile {
+    -fx-padding: 9 20 9 20;
+    -fx-background-color: -farbe-karte;
+    -fx-border-color: -farbe-karte-rand transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.fuss-text {
+    -fx-font-size: 10.5px;
+    -fx-text-fill: -farbe-text-schwach;
+}
+
+/* --- Bildlaufleisten ---------------------------------------------------- */
+
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -farbe-wolke;
+    -fx-background-radius: 6;
+    -fx-opacity: 0.55;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-opacity: 0.85;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+
+/* --- Kurzinfos ---------------------------------------------------------- */
+
+.tooltip {
+    -fx-background-color: -farbe-text;
+    -fx-text-fill: -farbe-karte;
+    -fx-background-radius: 7;
+    -fx-font-size: 11.5px;
+    -fx-padding: 6 10 6 10;
+}
+
+/* ======================================================================
+   7. Symbole
+   ====================================================================== */
+
+/*
+ * Die Gruppe eines Wettersymbols. Sie traegt selbst keine Farbe: In JavaFX
+ * vererbt sich -fx-fill nicht an Kindknoten, deshalb ist jede Einzelform
+ * unten gesondert eingefaerbt.
+ */
+.wetter-ikone {
+    -fx-opacity: 1;
+}
+
+/* Wettersymbole: gefuellte Formen ohne Kontur. */
+.ik-sonne   { -fx-fill: -farbe-sonne; }
+.ik-strahl  { -fx-stroke: -farbe-sonne; }
+.ik-mond    { -fx-fill: -farbe-mond; }
+.ik-wolke   { -fx-fill: -farbe-wolke; }
+.ik-wolke-hinten { -fx-fill: -farbe-wolke-hinten; }
+.ik-tropfen { -fx-stroke: -farbe-tropfen; }
+.ik-flocke  { -fx-stroke: -farbe-flocke; }
+.ik-blitz   { -fx-fill: -farbe-blitz; }
+.ik-nebel   { -fx-stroke: -farbe-nebel; }
+
+/* Bediensymbole: als Umriss gezeichnet ... */
+.ui-ikone {
+    -fx-fill: transparent;
+    -fx-stroke: -farbe-text;
+}
+
+/* ... oder ausgefuellt, etwa das gesetzte Lesezeichen. */
+.ui-ikone-voll {
+    -fx-fill: -farbe-text;
+    -fx-stroke: transparent;
+}

@@ -1,0 +1,38 @@
+# Maven
+target/
+
+# Eclipse
+bin/
+.classpath
+.project
+.settings/
+build.fxbuild
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# Visual Studio Code
+.vscode/
+
+# NetBeans
+nbproject/
+nbactions.xml
+
+# Betriebssystem
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Laufzeitdaten der Anwendung
+# (die Favoriten liegen im Benutzerverzeichnis, nicht im Projekt)
+favoriten.txt
+
+# Protokolle
+*.log
+hs_err_pid*.log
+
+# Archivierter Originalstand des Belegs (enthält einen alten API-Schlüssel
+# und gehört deshalb nicht in die Versionsgeschichte)
+.archiv-v1/
