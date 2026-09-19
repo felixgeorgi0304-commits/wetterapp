@@ -113,8 +113,15 @@
                     <!-- Stundenverlauf -->
                     <VBox styleClass="karte" spacing="10.0">
                         <Label styleClass="karten-titel" text="Nächste 24 Stunden" />
+                        <!--
+                            Die Hoehe dieses Rollbereichs setzt der Controller
+                            passend zum Inhalt (siehe stundenLeisteEinrichten).
+                            fitToHeight ist deshalb bewusst nicht gesetzt: Sonst
+                            wuerden sich Inhalts- und Rollbereichshoehe
+                            gegenseitig hochschaukeln.
+                        -->
                         <ScrollPane fx:id="stundenScroll" styleClass="stunden-scroll"
-                                    fitToHeight="true" vbarPolicy="NEVER" hbarPolicy="AS_NEEDED">
+                                    vbarPolicy="NEVER" hbarPolicy="AS_NEEDED">
                             <HBox fx:id="stundenLeiste" styleClass="stunden-leiste" spacing="2.0" />
                         </ScrollPane>
                     </VBox>

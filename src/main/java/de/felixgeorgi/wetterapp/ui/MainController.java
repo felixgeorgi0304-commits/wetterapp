@@ -28,6 +28,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -65,6 +66,13 @@ public class MainController {
     private static final double GROSSE_IKONE = 118;
     private static final double START_IKONE = 92;
     private static final double KNOPF_IKONE = 19;
+
+    /**
+     * Hoehe, die die waagerechte Bildlaufleiste am unteren Rand des
+     * Stundenverlaufs einnimmt. Sie wird bei der Hoehenberechnung eingerechnet,
+     * damit die Kacheln vollstaendig sichtbar bleiben.
+     */
+    private static final double BILDLAUFLEISTE_HOEHE = 16;
 
     // --- Oberflaechenelemente aus MainView.fxml -----------------------------
 
@@ -153,6 +161,7 @@ public class MainController {
     private void initialize() {
         symboleSetzen();
         ereignisseVerbinden();
+        stundenLeisteEinrichten();
 
         wurzel.getStyleClass().add(thema.stilKlasse());
         favoritenListe.setCellFactory(liste -> new FavoritenZelle());
@@ -179,6 +188,53 @@ public class MainController {
 
         suchenKnopf.getStyleClass().add("haupt-knopf");
         favoritKnopf.setDisable(true);
+    }
+
+    /**
+     * Richtet den Stundenverlauf so ein, dass er sich ausschliesslich
+     * waagerecht bewegen laesst.
+     * <p>
+     * Dafuer sind zwei Dinge noetig. Erstens nimmt die waagerechte
+     * Bildlaufleiste am unteren Rand einige Pixel Hoehe weg. Der sichtbare
+     * Bereich wird dadurch niedriger als die Kacheln, und genau um diese
+     * Differenz liesse sich die Leiste senkrecht verschieben. Die Hoehe des
+     * Rollbereichs richtet sich deshalb nach der Hoehe des Inhalts zuzueglich
+     * des Platzes fuer die Bildlaufleiste. Zweitens wird der senkrechte
+     * Rollweg mit {@code setVmax(0)} auf null gesetzt: Entsteht doch einmal
+     * eine Differenz, bleibt der Inhalt trotzdem oben stehen.
+     * <p>
+     * Zusaetzlich wird das Mausrad umgelenkt. Ohne das bliebe ein Drehen ueber
+     * der Leiste wirkungslos, weil es senkrecht rollen wuerde – und das ist
+     * nun abgeschaltet.
+     */
+    private void stundenLeisteEinrichten() {
+        // Senkrechter Rollweg von 0 bis 0: es gibt nichts zu verschieben.
+        stundenScroll.setVmax(0);
+
+        // Hoehe des Rollbereichs an den Inhalt anpassen, sobald die Kacheln
+        // stehen. Die Bildlaufleiste bekommt ihren Platz zusaetzlich.
+        stundenLeiste.heightProperty().addListener((o, alt, neu) -> {
+            double hoehe = neu.doubleValue() + BILDLAUFLEISTE_HOEHE;
+            stundenScroll.setMinHeight(hoehe);
+            stundenScroll.setPrefHeight(hoehe);
+            stundenScroll.setMaxHeight(hoehe);
+        });
+
+        // Mausrad und senkrechte Wischgeste bewegen die Leiste waagerecht.
+        stundenScroll.addEventFilter(ScrollEvent.SCROLL, e -> {
+            if (e.getDeltaY() == 0) {
+                // Eine bereits waagerechte Geste laeuft unveraendert weiter.
+                return;
+            }
+            double ueberhang = stundenLeiste.getWidth()
+                    - stundenScroll.getViewportBounds().getWidth();
+            if (ueberhang <= 0) {
+                // Alles passt ohnehin ins Bild.
+                return;
+            }
+            stundenScroll.setHvalue(stundenScroll.getHvalue() - e.getDeltaY() / ueberhang);
+            e.consume();
+        });
     }
 
     /**
