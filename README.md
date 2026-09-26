@@ -9,7 +9,7 @@
 Aktuelles Wetter, 24-Stunden-Verlauf und 7-Tage-Vorhersage für jeden Ort weltweit –
 mit hellem und dunklem Design, selbst gezeichneten Vektorsymbolen und ohne API-Schlüssel.
 
-[![Build](https://github.com/DEIN-GITHUB-NAME/wetterapp/actions/workflows/build.yml/badge.svg)](https://github.com/DEIN-GITHUB-NAME/wetterapp/actions/workflows/build.yml)
+[![Build](https://github.com/felixgeorgi0304-commits/wetterapp/actions/workflows/build.yml/badge.svg)](https://github.com/felixgeorgi0304-commits/wetterapp/actions/workflows/build.yml)
 ![Java](https://img.shields.io/badge/Java-21-orange)
 ![JavaFX](https://img.shields.io/badge/JavaFX-21-blue)
 ![Tests](https://img.shields.io/badge/Tests-JUnit%205-green)
@@ -46,7 +46,7 @@ mit hellem und dunklem Design, selbst gezeichneten Vektorsymbolen und ohne API-S
 Vorausgesetzt werden ein **JDK 21 oder neuer** und **Maven 3.9+**.
 
 ```bash
-git clone https://github.com/DEIN-GITHUB-NAME/wetterapp.git
+git clone https://github.com/felixgeorgi0304-commits/wetterapp.git
 cd wetterapp
 mvn javafx:run
 ```

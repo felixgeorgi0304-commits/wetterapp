@@ -63,8 +63,8 @@ import java.util.concurrent.Executors;
  */
 public class MainController {
 
-    private static final double GROSSE_IKONE = 118;
-    private static final double START_IKONE = 92;
+    private static final double GROSSE_IKONE = 92;
+    private static final double START_IKONE = 84;
     private static final double KNOPF_IKONE = 19;
 
     /**
@@ -72,7 +72,7 @@ public class MainController {
      * Stundenverlaufs einnimmt. Sie wird bei der Hoehenberechnung eingerechnet,
      * damit die Kacheln vollstaendig sichtbar bleiben.
      */
-    private static final double BILDLAUFLEISTE_HOEHE = 16;
+    private static final double BILDLAUFLEISTE_HOEHE = 18;
 
     // --- Oberflaechenelemente aus MainView.fxml -----------------------------
 
@@ -194,25 +194,26 @@ public class MainController {
      * Richtet den Stundenverlauf so ein, dass er sich ausschliesslich
      * waagerecht bewegen laesst.
      * <p>
-     * Dafuer sind zwei Dinge noetig. Erstens nimmt die waagerechte
-     * Bildlaufleiste am unteren Rand einige Pixel Hoehe weg. Der sichtbare
-     * Bereich wird dadurch niedriger als die Kacheln, und genau um diese
-     * Differenz liesse sich die Leiste senkrecht verschieben. Die Hoehe des
-     * Rollbereichs richtet sich deshalb nach der Hoehe des Inhalts zuzueglich
-     * des Platzes fuer die Bildlaufleiste. Zweitens wird der senkrechte
-     * Rollweg mit {@code setVmax(0)} auf null gesetzt: Entsteht doch einmal
-     * eine Differenz, bleibt der Inhalt trotzdem oben stehen.
+     * Die Ursache des senkrechten Spiels ist die waagerechte Bildlaufleiste:
+     * Sie nimmt am unteren Rand einige Pixel Hoehe weg, wodurch der sichtbare
+     * Bereich niedriger wird als die Kacheln. Genau um diese Differenz liesse
+     * sich die Leiste verschieben.
      * <p>
-     * Zusaetzlich wird das Mausrad umgelenkt. Ohne das bliebe ein Drehen ueber
-     * der Leiste wirkungslos, weil es senkrecht rollen wuerde – und das ist
-     * nun abgeschaltet.
+     * Dagegen wirken hier drei Massnahmen, die sich gegenseitig absichern:
+     * <ol>
+     *   <li>Die Hoehe des Rollbereichs richtet sich nach der Hoehe des Inhalts
+     *       zuzueglich des Platzes fuer die Bildlaufleiste. Damit entsteht die
+     *       Differenz gar nicht erst.</li>
+     *   <li>Jede senkrechte Verschiebung wird sofort zurueckgenommen. Sollte
+     *       die Bildlaufleiste auf einem System hoeher ausfallen als
+     *       angenommen, bleibt die Leiste trotzdem stehen.</li>
+     *   <li>Rollereignisse werden abgefangen und in eine waagerechte Bewegung
+     *       umgesetzt. Sie erreichen den Rollbereich also gar nicht mehr.</li>
+     * </ol>
      */
     private void stundenLeisteEinrichten() {
-        // Senkrechter Rollweg von 0 bis 0: es gibt nichts zu verschieben.
-        stundenScroll.setVmax(0);
-
-        // Hoehe des Rollbereichs an den Inhalt anpassen, sobald die Kacheln
-        // stehen. Die Bildlaufleiste bekommt ihren Platz zusaetzlich.
+        // 1. Hoehe des Rollbereichs an den Inhalt anpassen, sobald die Kacheln
+        //    stehen. Die Bildlaufleiste bekommt ihren Platz zusaetzlich.
         stundenLeiste.heightProperty().addListener((o, alt, neu) -> {
             double hoehe = neu.doubleValue() + BILDLAUFLEISTE_HOEHE;
             stundenScroll.setMinHeight(hoehe);
@@ -220,19 +221,29 @@ public class MainController {
             stundenScroll.setMaxHeight(hoehe);
         });
 
-        // Mausrad und senkrechte Wischgeste bewegen die Leiste waagerecht.
-        stundenScroll.addEventFilter(ScrollEvent.SCROLL, e -> {
-            if (e.getDeltaY() == 0) {
-                // Eine bereits waagerechte Geste laeuft unveraendert weiter.
-                return;
+        // 2. Sicherheitsnetz: Der senkrechte Rollwert wird auf 0 festgehalten.
+        //    Bewusst nicht ueber setVmax(0) geloest – bei vmin == vmax rechnet
+        //    die Oberflaeche mit einer Spanne von null weiter.
+        stundenScroll.vvalueProperty().addListener((o, alt, neu) -> {
+            if (neu.doubleValue() != 0) {
+                stundenScroll.setVvalue(0);
             }
+        });
+
+        // 3. Mausrad und Wischgeste bewegen die Leiste waagerecht. Das Ereignis
+        //    wird in jedem Fall verbraucht, damit es weder den Rollbereich
+        //    senkrecht verschiebt noch an die Seite dahinter weitergereicht wird.
+        stundenScroll.addEventFilter(ScrollEvent.SCROLL, e -> {
             double ueberhang = stundenLeiste.getWidth()
                     - stundenScroll.getViewportBounds().getWidth();
-            if (ueberhang <= 0) {
-                // Alles passt ohnehin ins Bild.
-                return;
+            if (ueberhang > 0) {
+                // Die staerkere der beiden Richtungen bestimmt die Bewegung:
+                // ein Mausrad liefert nur deltaY, ein Trackpad auch deltaX.
+                double weg = Math.abs(e.getDeltaX()) > Math.abs(e.getDeltaY())
+                        ? e.getDeltaX()
+                        : e.getDeltaY();
+                stundenScroll.setHvalue(stundenScroll.getHvalue() - weg / ueberhang);
             }
-            stundenScroll.setHvalue(stundenScroll.getHvalue() - e.getDeltaY() / ueberhang);
             e.consume();
         });
     }

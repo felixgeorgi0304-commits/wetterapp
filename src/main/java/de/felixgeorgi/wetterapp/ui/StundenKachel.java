@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
  */
 public class StundenKachel extends VBox {
 
-    private static final double IKONEN_GROESSE = 38;
+    private static final double IKONEN_GROESSE = 34;
 
     /**
      * Baut die Kachel zu einer Stundenvorhersage.
@@ -33,7 +33,7 @@ public class StundenKachel extends VBox {
     public StundenKachel(StundenVorhersage vorhersage, LocalDateTime jetztAmOrt) {
         getStyleClass().add("stunden-kachel");
         setAlignment(Pos.CENTER);
-        setSpacing(6);
+        setSpacing(5);
 
         String beschriftung = Formatierung.stundenBeschriftung(vorhersage.zeitpunkt(), jetztAmOrt);
         boolean istJetzt = "Jetzt".equals(beschriftung);

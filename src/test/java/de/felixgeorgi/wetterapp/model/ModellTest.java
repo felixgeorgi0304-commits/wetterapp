@@ -56,14 +56,25 @@ class ModellTest {
             assertEquals("Atlantis", ort.anzeigeName());
         }
 
-        @Test
+        @ParameterizedTest(name = "{0} / {1} wird zu \"{2}\"")
+        @CsvSource({
+                // Stadtstaaten: die Region wiederholt nur den Ort
+                "Hamburg,    Hamburg,      'Hamburg, Deutschland'",
+                "Berlin,     Land Berlin,  'Berlin, Deutschland'",
+                "Bremen,     Freie Hansestadt Bremen, 'Bremen, Deutschland'",
+                "berlin,     LAND BERLIN,  'berlin, Deutschland'",
+                // echte Regionsangaben bleiben erhalten
+                "Mittweida,  Sachsen,      'Mittweida, Sachsen, Deutschland'",
+                "Bern,       Bernkastel,   'Bern, Bernkastel, Deutschland'"
+        })
         @DisplayName("wiederholt den Ortsnamen nicht als Region")
-        void anzeigenameOhneDoppelung() {
-            // Stadtstaaten liefert die API mit identischem Namen und Region,
-            // etwa "Hamburg, Hamburg, Deutschland".
-            Ort ort = new Ort("Hamburg", "Hamburg", "Deutschland", 53.55, 10.0, "Europe/Berlin");
+        void anzeigenameOhneDoppelung(String name, String region, String erwartet) {
+            // Bei Stadtstaaten liefert die API Ort und Region nahezu
+            // gleichlautend. "Bernkastel" enthaelt zwar die Buchstabenfolge
+            // "Bern", ist aber eine andere Angabe und muss stehen bleiben.
+            Ort ort = new Ort(name, region, "Deutschland", 53.55, 10.0, "Europe/Berlin");
 
-            assertEquals("Hamburg, Deutschland", ort.anzeigeName());
+            assertEquals(erwartet, ort.anzeigeName());
         }
     }
 

@@ -1,6 +1,7 @@
 package de.felixgeorgi.wetterapp.model;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * Ein geografischer Ort mit seinen Koordinaten.
@@ -55,12 +56,34 @@ public record Ort(
      */
     public String anzeigeName() {
         StringBuilder sb = new StringBuilder(name);
-        if (region != null && !region.isBlank() && !region.equals(name)) {
+        if (region != null && !region.isBlank() && !wiederholtDenOrtsnamen(region, name)) {
             sb.append(", ").append(region);
         }
         if (land != null && !land.isBlank()) {
             sb.append(", ").append(land);
         }
         return sb.toString();
+    }
+
+    /**
+     * Prueft, ob eine Regionsangabe lediglich den Ortsnamen wiederholt.
+     * <p>
+     * Bei Stadtstaaten liefert die API Ort und Region nahezu gleichlautend,
+     * etwa "Berlin" und "Land Berlin". Ohne diese Pruefung entstuende daraus
+     * die Anzeige "Berlin, Land Berlin, Deutschland".
+     * <p>
+     * Verglichen wird auf ganze Woerter und ohne Ruecksicht auf Gross- und
+     * Kleinschreibung. Ein blosser Zeichenkettenvergleich waere zu grob:
+     * "Bernkastel" enthaelt zwar die Buchstabenfolge "Bern", ist aber eine
+     * andere Ortsangabe und soll erhalten bleiben.
+     *
+     * @param region zu pruefende Regionsangabe
+     * @param name   Name des Ortes
+     * @return {@code true}, wenn die Region den Ortsnamen als eigenstaendiges
+     *         Wort enthaelt
+     */
+    private static boolean wiederholtDenOrtsnamen(String region, String name) {
+        String muster = "(?i)(^|\\W)" + Pattern.quote(name.strip()) + "(\\W|$)";
+        return Pattern.compile(muster).matcher(region.strip()).find();
     }
 }

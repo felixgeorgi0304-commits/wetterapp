@@ -31,7 +31,7 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:id="wurzel"
             styleClass="wurzel"
-            prefWidth="960.0" prefHeight="720.0">
+            prefWidth="960.0" prefHeight="870.0">
 
     <top>
         <VBox>
@@ -93,14 +93,14 @@
                 <VBox fx:id="inhalt" styleClass="inhalt" spacing="18.0">
 
                     <!-- Aktuelle Lage -->
-                    <VBox fx:id="heldKarte" styleClass="held-karte" spacing="14.0">
+                    <VBox fx:id="heldKarte" styleClass="held-karte" spacing="10.0">
                         <VBox spacing="2.0">
                             <Label fx:id="ortLabel" styleClass="ort-name" text="—" />
                             <Label fx:id="zeitLabel" styleClass="ort-zeit" text="" />
                         </VBox>
 
-                        <HBox alignment="CENTER_LEFT" spacing="22.0">
-                            <StackPane fx:id="grossIkone" minWidth="120.0" minHeight="120.0" />
+                        <HBox alignment="CENTER_LEFT" spacing="20.0">
+                            <StackPane fx:id="grossIkone" minWidth="96.0" minHeight="96.0" />
                             <VBox spacing="0.0">
                                 <Label fx:id="temperaturLabel" styleClass="temperatur-gross" text="—" />
                                 <Label fx:id="beschreibungLabel" styleClass="beschreibung" text="" />

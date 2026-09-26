@@ -23,7 +23,7 @@ import java.time.LocalDate;
  */
 public class TagesZeile extends HBox {
 
-    private static final double IKONEN_GROESSE = 30;
+    private static final double IKONEN_GROESSE = 26;
     private static final double BALKEN_BREITE = 120;
 
     /**

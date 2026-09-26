@@ -89,7 +89,7 @@
 }
 
 .kopfzeile {
-    -fx-padding: 14 20 14 20;
+    -fx-padding: 11 20 11 20;
     -fx-background-color: -farbe-karte;
     -fx-border-color: transparent transparent -farbe-karte-rand transparent;
     -fx-border-width: 0 0 1 0;
@@ -200,7 +200,7 @@
 }
 
 .inhalt {
-    -fx-padding: 20;
+    -fx-padding: 16;
 }
 
 .karte {
@@ -209,7 +209,7 @@
     -fx-border-color: -farbe-karte-rand;
     -fx-border-radius: 16;
     -fx-border-width: 1;
-    -fx-padding: 18 20 18 20;
+    -fx-padding: 14 18 14 18;
     -fx-effect: dropshadow(gaussian, -farbe-schatten, 14, 0, 0, 3);
 }
 
@@ -227,7 +227,7 @@
  */
 .held-karte {
     -fx-background-radius: 20;
-    -fx-padding: 24 26 26 26;
+    -fx-padding: 18 22 20 22;
     -fx-effect: dropshadow(gaussian, -farbe-schatten, 20, 0, 0, 6);
 
     -farbe-text:         white;
@@ -269,8 +269,38 @@
     -fx-background-color: linear-gradient(to bottom right, #141a33 0%, #263354 60%, #3a4a72 100%);
 }
 
+/*
+ * Im dunklen Design werden dieselben Verlaeufe gedaempft. Die Hauptkarte
+ * bleibt das farbige Herzstueck der Ansicht, leuchtet auf dem dunklen Grund
+ * aber nicht mehr wie ein Fremdkoerper. Nur die Hintergruende werden ersetzt;
+ * Schrift- und Symbolfarben gelten unveraendert weiter.
+ */
+.wurzel.dunkel .held-karte.stimmung-klar {
+    -fx-background-color: linear-gradient(to bottom right, #17497a 0%, #245f96 55%, #3079b0 100%);
+}
+
+.wurzel.dunkel .held-karte.stimmung-wolken {
+    -fx-background-color: linear-gradient(to bottom right, #3a4553 0%, #4d5a6b 60%, #5d6b7d 100%);
+}
+
+.wurzel.dunkel .held-karte.stimmung-regen {
+    -fx-background-color: linear-gradient(to bottom right, #24384c 0%, #32495f 60%, #3f5871 100%);
+}
+
+.wurzel.dunkel .held-karte.stimmung-schnee {
+    -fx-background-color: linear-gradient(to bottom right, #3f566c 0%, #52708a 60%, #6786a0 100%);
+}
+
+.wurzel.dunkel .held-karte.stimmung-gewitter {
+    -fx-background-color: linear-gradient(to bottom right, #1e2030 0%, #2d3045 60%, #3b3e56 100%);
+}
+
+.wurzel.dunkel .held-karte.stimmung-nacht {
+    -fx-background-color: linear-gradient(to bottom right, #0e1324 0%, #1a2440 60%, #26344f 100%);
+}
+
 .ort-name {
-    -fx-font-size: 21px;
+    -fx-font-size: 19px;
     -fx-font-weight: bold;
     -fx-text-fill: -farbe-text;
 }
@@ -281,13 +311,13 @@
 }
 
 .temperatur-gross {
-    -fx-font-size: 66px;
+    -fx-font-size: 54px;
     -fx-text-fill: -farbe-text;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.18), 10, 0, 0, 3);
 }
 
 .beschreibung {
-    -fx-font-size: 16px;
+    -fx-font-size: 15px;
     -fx-text-fill: -farbe-text-schwach;
     -fx-padding: 2 0 0 4;
 }
@@ -331,7 +361,7 @@
 }
 
 .stunden-kachel {
-    -fx-padding: 12 10 12 10;
+    -fx-padding: 10 9 10 9;
     -fx-background-radius: 14;
     -fx-min-width: 74;
 }
@@ -376,7 +406,7 @@
 }
 
 .tages-zeile {
-    -fx-padding: 9 6 9 6;
+    -fx-padding: 6 6 6 6;
     -fx-background-radius: 10;
 }
 
@@ -545,7 +575,7 @@
 }
 
 .fusszeile {
-    -fx-padding: 9 20 9 20;
+    -fx-padding: 7 20 7 20;
     -fx-background-color: -farbe-karte;
     -fx-border-color: -farbe-karte-rand transparent transparent transparent;
     -fx-border-width: 1 0 0 0;
